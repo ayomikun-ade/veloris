@@ -5,7 +5,7 @@ import {
   Chart01Icon,
   ChartAreaIcon,
   Activity01Icon,
-  Globe02Icon,
+  GridViewIcon,
 } from '@hugeicons/core-free-icons'
 import BaseCard from '@/components/BaseCard.vue'
 import BaseBadge from '@/components/BaseBadge.vue'
@@ -13,6 +13,8 @@ import ControlsBar from '@/components/dashboard/ControlsBar.vue'
 import EventRateChart from '@/components/charts/EventRateChart.vue'
 import SeverityMixChart from '@/components/charts/SeverityMixChart.vue'
 import TopCategoriesChart from '@/components/charts/TopCategoriesChart.vue'
+import TopSourceCountries from '@/components/charts/TopSourceCountries.vue'
+import CategoryHeatmap from '@/components/charts/CategoryHeatmap.vue'
 import ActivityFeed from '@/components/feed/ActivityFeed.vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useEventsStore } from '@/stores/events'
@@ -148,18 +150,26 @@ const streamBadge = computed(() => {
       </BaseCard>
 
       <BaseCard>
-        <div class="flex h-130 flex-col p-4">
+        <div class="h-130">
+          <TopSourceCountries />
+        </div>
+      </BaseCard>
+    </section>
+
+    <section id="patterns" class="space-y-3">
+      <BaseCard>
+        <div class="flex h-80 flex-col p-4">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-sm font-semibold">Geographic origins</p>
-              <p class="text-xs text-muted">Attack sources worldwide</p>
+              <p class="text-sm font-semibold">Activity heatmap</p>
+              <p class="text-xs text-muted">
+                events per category in 5-minute buckets · last hour
+              </p>
             </div>
-            <HugeiconsIcon :icon="Globe02Icon" :size="18" class="text-muted" />
+            <HugeiconsIcon :icon="GridViewIcon" :size="18" class="text-muted" />
           </div>
-          <div
-            class="mt-4 flex flex-1 items-center justify-center rounded-md border border-dashed border-border/70 bg-surface-2/40 text-xs text-muted"
-          >
-            Geo map lands in Stage 7
+          <div class="mt-3 min-h-0 flex-1">
+            <CategoryHeatmap />
           </div>
         </div>
       </BaseCard>
