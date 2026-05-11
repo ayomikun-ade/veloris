@@ -9,6 +9,9 @@ import {
 } from '@hugeicons/core-free-icons'
 import BaseCard from '@/components/BaseCard.vue'
 import BaseBadge from '@/components/BaseBadge.vue'
+import EventRateChart from '@/components/charts/EventRateChart.vue'
+import SeverityMixChart from '@/components/charts/SeverityMixChart.vue'
+import TopCategoriesChart from '@/components/charts/TopCategoriesChart.vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useEventsStore } from '@/stores/events'
 import { useMetricsStore } from '@/stores/metrics'
@@ -30,22 +33,6 @@ const streamBadge = computed(() => {
     return { variant: 'critical' as const, label: 'Stream offline' }
   return { variant: 'neutral' as const, label: 'Stream idle' }
 })
-
-const chartSlots = [
-  { id: 'rate', title: 'Event rate', subtitle: 'events / second over time', icon: Chart01Icon },
-  {
-    id: 'severity',
-    title: 'Severity mix',
-    subtitle: 'stacked area by severity',
-    icon: ChartAreaIcon,
-  },
-  {
-    id: 'categories',
-    title: 'Top categories',
-    subtitle: 'attack types in window',
-    icon: Activity01Icon,
-  },
-]
 </script>
 
 <template>
@@ -55,7 +42,8 @@ const chartSlots = [
         <div>
           <h2 class="text-lg font-semibold">Overview</h2>
           <p class="text-xs text-muted">
-            {{ totalText }} events ingested · buffer {{ events.bufferSize }} / {{ events.MAX_EVENTS }}
+            {{ totalText }} events ingested · buffer {{ events.bufferSize }} /
+            {{ events.MAX_EVENTS }}
           </p>
         </div>
         <BaseBadge :variant="streamBadge.variant" dot>{{ streamBadge.label }}</BaseBadge>
@@ -101,20 +89,48 @@ const chartSlots = [
       </div>
     </section>
 
-    <section id="threats" class="grid grid-cols-1 gap-3 lg:grid-cols-3">
-      <BaseCard v-for="c in chartSlots" :key="c.id">
-        <div class="flex min-h-[240px] flex-col p-4">
+    <section id="threats" class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+      <BaseCard>
+        <div class="flex h-[280px] flex-col p-4">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-sm font-semibold">{{ c.title }}</p>
-              <p class="text-xs text-muted">{{ c.subtitle }}</p>
+              <p class="text-sm font-semibold">Event rate</p>
+              <p class="text-xs text-muted">events / second · last 2 min</p>
             </div>
-            <HugeiconsIcon :icon="c.icon" :size="18" class="text-muted" />
+            <HugeiconsIcon :icon="Chart01Icon" :size="18" class="text-muted" />
           </div>
-          <div
-            class="mt-4 flex flex-1 items-center justify-center rounded-md border border-dashed border-border/70 bg-surface-2/40 text-xs text-muted"
-          >
-            Chart lands in Stage 4
+          <div class="mt-3 min-h-0 flex-1">
+            <EventRateChart />
+          </div>
+        </div>
+      </BaseCard>
+
+      <BaseCard>
+        <div class="flex h-[280px] flex-col p-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm font-semibold">Severity mix</p>
+              <p class="text-xs text-muted">stacked by severity · last 2 min</p>
+            </div>
+            <HugeiconsIcon :icon="ChartAreaIcon" :size="18" class="text-muted" />
+          </div>
+          <div class="mt-3 min-h-0 flex-1">
+            <SeverityMixChart />
+          </div>
+        </div>
+      </BaseCard>
+
+      <BaseCard class="lg:col-span-2 xl:col-span-1">
+        <div class="flex h-[280px] flex-col p-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm font-semibold">Top categories</p>
+              <p class="text-xs text-muted">attack types in current buffer</p>
+            </div>
+            <HugeiconsIcon :icon="Activity01Icon" :size="18" class="text-muted" />
+          </div>
+          <div class="mt-3 min-h-0 flex-1">
+            <TopCategoriesChart />
           </div>
         </div>
       </BaseCard>
