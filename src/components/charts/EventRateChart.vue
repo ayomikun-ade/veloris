@@ -3,15 +3,26 @@ import { computed } from 'vue'
 import VChart from 'vue-echarts'
 import type { EChartsOption } from 'echarts'
 import '@/lib/echarts'
+import type { Severity } from '@/types/event'
 import { useTimeseriesStore } from '@/stores/timeseries'
+import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
 
 const timeseries = useTimeseriesStore()
+const filters = useFiltersStore()
 const theme = useChartTheme()
+
+const SEVS: Severity[] = ['info', 'low', 'medium', 'high', 'critical']
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
-  const points = timeseries.buckets.map((b) => [b.t * 1000, timeseries.totalOf(b)])
+  const buckets = timeseries.lastNSeconds(filters.timeRangeSec)
+  const active = filters.activeSeverities
+  const points = buckets.map((b) => {
+    let total = 0
+    for (const s of SEVS) if (active.has(s)) total += b.counts[s]
+    return [b.t * 1000, total]
+  })
 
   return {
     animation: true,

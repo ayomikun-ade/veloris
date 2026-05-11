@@ -3,20 +3,23 @@ import { computed } from 'vue'
 import VChart from 'vue-echarts'
 import type { EChartsOption } from 'echarts'
 import '@/lib/echarts'
-import { SEVERITIES } from '@/types/event'
+import type { Severity } from '@/types/event'
 import { useTimeseriesStore } from '@/stores/timeseries'
+import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
 
 const timeseries = useTimeseriesStore()
+const filters = useFiltersStore()
 const theme = useChartTheme()
 
-const SEVERITY_ORDER = ['info', 'low', 'medium', 'high', 'critical'] as const
+const SEVERITY_ORDER: Severity[] = ['info', 'low', 'medium', 'high', 'critical']
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
-  const buckets = timeseries.buckets
+  const buckets = timeseries.lastNSeconds(filters.timeRangeSec)
+  const visible = SEVERITY_ORDER.filter((s) => filters.activeSeverities.has(s))
 
-  const series = SEVERITY_ORDER.map((sev) => ({
+  const series = visible.map((sev) => ({
     name: sev,
     type: 'line' as const,
     stack: 'severity',
@@ -31,9 +34,9 @@ const option = computed<EChartsOption>(() => {
   return {
     animation: true,
     animationDurationUpdate: 0,
-    color: SEVERITIES.map((s) => t.severity[s]),
+    color: visible.map((s) => t.severity[s]),
     legend: {
-      data: SEVERITY_ORDER.map((s) => s),
+      data: visible,
       bottom: 0,
       textStyle: { color: t.muted, fontSize: 10 },
       itemWidth: 10,

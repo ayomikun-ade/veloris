@@ -5,21 +5,24 @@ import type { EChartsOption } from 'echarts'
 import '@/lib/echarts'
 import type { Category } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
+import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
 
 const TOP_N = 8
 
 const events = useEventsStore()
+const filters = useFiltersStore()
 const theme = useChartTheme()
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
+  const active = filters.activeSeverities
   const counts = new Map<Category, number>()
   for (const ev of events.events) {
+    if (!active.has(ev.severity)) continue
     counts.set(ev.category, (counts.get(ev.category) ?? 0) + 1)
   }
   const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, TOP_N)
-  // ECharts renders y-axis categories bottom→top, so reverse to put the largest on top
   const names = sorted.map(([n]) => n).reverse()
   const values = sorted.map(([, c]) => c).reverse()
 

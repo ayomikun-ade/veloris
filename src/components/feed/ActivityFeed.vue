@@ -7,35 +7,18 @@ import BaseBadge from '@/components/BaseBadge.vue'
 import EventDetailDrawer from '@/components/feed/EventDetailDrawer.vue'
 import { SEVERITIES, type Severity, type Status, type ThreatEvent } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
+import { useFiltersStore } from '@/stores/filters'
 import { useNow } from '@/composables/useNow'
 import { formatRelativeTime } from '@/lib/format'
 
 const events = useEventsStore()
+const filters = useFiltersStore()
 const now = useNow()
-
-const search = ref('')
-const activeSeverities = ref<Set<Severity>>(new Set(SEVERITIES))
-
-function toggleSeverity(sev: Severity) {
-  const next = new Set(activeSeverities.value)
-  if (next.has(sev)) next.delete(sev)
-  else next.add(sev)
-  activeSeverities.value = next
-}
-
-function clearFilters() {
-  search.value = ''
-  activeSeverities.value = new Set(SEVERITIES)
-}
-
-const filtersActive = computed(() => {
-  return search.value.length > 0 || activeSeverities.value.size !== SEVERITIES.length
-})
 
 const filtered = computed<ThreatEvent[]>(() => {
   const buf = events.events
-  const active = activeSeverities.value
-  const q = search.value.trim().toLowerCase()
+  const active = filters.activeSeverities
+  const q = filters.search.trim().toLowerCase()
   if (active.size === SEVERITIES.length && q.length === 0) return buf
   const result: ThreatEvent[] = []
   for (const ev of buf) {
@@ -78,14 +61,6 @@ const SEVERITY_DOT: Record<Severity, string> = {
   critical: 'bg-severity-critical',
 }
 
-const SEVERITY_LABEL: Record<Severity, string> = {
-  info: 'Info',
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-  critical: 'Critical',
-}
-
 const STATUS_VARIANT: Record<Status, 'low' | 'info' | 'medium' | 'high'> = {
   blocked: 'low',
   mitigated: 'info',
@@ -110,44 +85,25 @@ const STATUS_VARIANT: Record<Status, 'low' | 'info' | 'medium' | 'high'> = {
       <HugeiconsIcon :icon="Activity01Icon" :size="18" class="text-muted" />
     </div>
 
-    <div class="space-y-2 px-4 pt-3 pb-2">
+    <div class="px-4 pt-3 pb-2">
       <div class="relative">
         <span class="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-muted">
           <HugeiconsIcon :icon="Search01Icon" :size="14" />
         </span>
         <input
-          v-model="search"
+          v-model="filters.search"
           type="search"
           placeholder="Search IP, asset, description, category…"
           class="w-full rounded-md border bg-surface-2 py-1.5 pr-8 pl-8 text-sm placeholder:text-muted focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
         />
         <button
-          v-if="filtersActive"
+          v-if="!filters.isDefault"
           type="button"
           class="absolute inset-y-0 right-1 inline-flex items-center rounded p-1 text-muted transition-colors hover:bg-surface hover:text-text"
           aria-label="Clear filters"
-          @click="clearFilters"
+          @click="filters.clear"
         >
           <HugeiconsIcon :icon="Cancel01Icon" :size="14" />
-        </button>
-      </div>
-
-      <div class="flex flex-wrap items-center gap-1.5">
-        <button
-          v-for="sev in SEVERITIES"
-          :key="sev"
-          type="button"
-          :aria-pressed="activeSeverities.has(sev)"
-          :class="[
-            'inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium transition-colors',
-            activeSeverities.has(sev)
-              ? 'bg-surface-2 text-text'
-              : 'border-transparent text-muted hover:bg-surface-2',
-          ]"
-          @click="toggleSeverity(sev)"
-        >
-          <span :class="['h-1.5 w-1.5 rounded-full', SEVERITY_DOT[sev]]" />
-          {{ SEVERITY_LABEL[sev] }}
         </button>
       </div>
     </div>
@@ -198,12 +154,8 @@ const STATUS_VARIANT: Record<Status, 'low' | 'info' | 'medium' | 'high'> = {
         v-else
         class="flex h-full items-center justify-center px-6 text-center text-xs text-muted"
       >
-        <template v-if="events.bufferSize === 0">
-          Waiting for first events…
-        </template>
-        <template v-else>
-          No events match the current filters.
-        </template>
+        <template v-if="events.bufferSize === 0">Waiting for first events…</template>
+        <template v-else>No events match the current filters.</template>
       </div>
     </div>
 

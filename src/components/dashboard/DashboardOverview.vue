@@ -9,6 +9,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import BaseCard from '@/components/BaseCard.vue'
 import BaseBadge from '@/components/BaseBadge.vue'
+import ControlsBar from '@/components/dashboard/ControlsBar.vue'
 import EventRateChart from '@/components/charts/EventRateChart.vue'
 import SeverityMixChart from '@/components/charts/SeverityMixChart.vue'
 import TopCategoriesChart from '@/components/charts/TopCategoriesChart.vue'
@@ -38,6 +39,8 @@ const streamBadge = computed(() => {
 
 <template>
   <div class="space-y-6 p-4 md:p-6">
+    <ControlsBar />
+
     <section id="overview" class="space-y-4">
       <div class="flex items-center justify-between">
         <div>
@@ -92,7 +95,7 @@ const streamBadge = computed(() => {
 
     <section id="threats" class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
       <BaseCard>
-        <div class="flex h-[280px] flex-col p-4">
+        <div class="flex h-70 flex-col p-4">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-sm font-semibold">Event rate</p>
@@ -107,7 +110,7 @@ const streamBadge = computed(() => {
       </BaseCard>
 
       <BaseCard>
-        <div class="flex h-[280px] flex-col p-4">
+        <div class="flex h-70 flex-col p-4">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-sm font-semibold">Severity mix</p>
@@ -122,7 +125,7 @@ const streamBadge = computed(() => {
       </BaseCard>
 
       <BaseCard class="lg:col-span-2 xl:col-span-1">
-        <div class="flex h-[280px] flex-col p-4">
+        <div class="flex h-70 flex-col p-4">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-sm font-semibold">Top categories</p>

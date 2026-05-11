@@ -1,4 +1,4 @@
-import { onScopeDispose } from 'vue'
+import { inject, onScopeDispose, type InjectionKey } from 'vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useEventsStore } from '@/stores/events'
 import { useTimeseriesStore } from '@/stores/timeseries'
@@ -11,7 +11,17 @@ type WorkerOutput =
 
 const TICK_INTERVAL_MS = 1000
 
-export function useStreamConnection() {
+export interface StreamController {
+  start(): void
+  pause(): void
+  resume(): void
+  setThroughput(eventsPerSec: number): void
+  stop(): void
+}
+
+export const streamKey: InjectionKey<StreamController> = Symbol('veloris-stream')
+
+export function useStreamConnection(): StreamController {
   const connection = useConnectionStore()
   const events = useEventsStore()
   const timeseries = useTimeseriesStore()
@@ -82,4 +92,12 @@ export function useStreamConnection() {
   })
 
   return { start, pause, resume, setThroughput, stop }
+}
+
+export function useStream(): StreamController {
+  const stream = inject(streamKey)
+  if (!stream) {
+    throw new Error('useStream() called without a stream provider in the ancestor tree')
+  }
+  return stream
 }
