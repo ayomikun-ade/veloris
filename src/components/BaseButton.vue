@@ -25,7 +25,7 @@ const SIZES: Record<Size, string> = {
     type="button"
     :class="[
       'inline-flex items-center justify-center rounded-md font-medium transition-colors',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
+      'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent',
       'disabled:cursor-not-allowed disabled:opacity-50',
       VARIANTS[variant],
       SIZES[size],
