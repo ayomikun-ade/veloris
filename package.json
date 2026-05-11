@@ -12,6 +12,10 @@
     "format": "prettier --write \"src/**/*.{ts,vue,css}\""
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "@fontsource/ibm-plex-sans": "^5.2.8",
+    "@hugeicons/core-free-icons": "^4.1.3",
+    "@hugeicons/vue": "^1.0.5",
     "pinia": "^3.0.4",
     "vue": "^3.5.34"
   },

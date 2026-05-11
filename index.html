@@ -5,6 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Veloris — Real-Time Threat Analytics</title>
+    <script>
+      // Anti-FOUC: respect stored preference before Vue boots. Default is dark.
+      (function () {
+        try {
+          var stored = localStorage.getItem('veloris-theme')
+          if (stored === 'light') document.documentElement.classList.remove('dark')
+        } catch (e) {
+          /* localStorage unavailable — stay on default */
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

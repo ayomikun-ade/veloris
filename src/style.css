@@ -3,13 +3,34 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-bg: 250 250 252;
+    --color-surface: 255 255 255;
+    --color-surface-2: 244 244 248;
+    --color-border: 226 226 230;
+    --color-text: 15 15 20;
+    --color-muted: 100 100 115;
+    --color-accent: 8 145 178;
+    --color-accent-soft: 207 250 254;
+    --color-on-accent: 255 255 255;
+  }
+
+  html.dark {
+    --color-bg: 6 8 14;
+    --color-surface: 15 18 28;
+    --color-surface-2: 22 26 38;
+    --color-border: 32 38 54;
+    --color-text: 226 232 240;
+    --color-muted: 130 138 158;
+    --color-accent: 34 211 238;
+    --color-accent-soft: 6 78 99;
+    --color-on-accent: 15 18 28;
+  }
+
   html {
     @apply antialiased;
   }
   body {
-    @apply bg-white text-slate-900;
-  }
-  html.dark body {
-    @apply bg-slate-950 text-slate-100;
+    @apply bg-bg text-text font-sans;
   }
 }
