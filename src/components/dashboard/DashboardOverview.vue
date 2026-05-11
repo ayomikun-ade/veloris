@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import {
   Chart01Icon,
@@ -8,13 +9,27 @@ import {
 } from '@hugeicons/core-free-icons'
 import BaseCard from '@/components/BaseCard.vue'
 import BaseBadge from '@/components/BaseBadge.vue'
+import { useConnectionStore } from '@/stores/connection'
+import { useEventsStore } from '@/stores/events'
+import { useMetricsStore } from '@/stores/metrics'
 
-const metrics = [
-  { id: 'events', label: 'Events / sec', value: '—', trend: 'awaiting stream' },
-  { id: 'critical', label: 'Critical alerts', value: '—', trend: 'awaiting stream' },
-  { id: 'blocked', label: 'Blocked', value: '—', trend: 'awaiting stream' },
-  { id: 'mttr', label: 'Avg. mitigation', value: '—', trend: 'awaiting stream' },
-]
+const connection = useConnectionStore()
+const events = useEventsStore()
+const metrics = useMetricsStore()
+
+const eventsPerSec = computed(() => metrics.eventsPerSecond.toFixed(1))
+const blockedPct = computed(() => `${Math.round(metrics.blockedRate * 100)}%`)
+const totalText = computed(() => events.totalIngested.toLocaleString())
+
+const streamBadge = computed(() => {
+  if (connection.state === 'connected') return { variant: 'low' as const, label: 'Stream live' }
+  if (connection.state === 'paused') return { variant: 'medium' as const, label: 'Stream paused' }
+  if (connection.state === 'connecting')
+    return { variant: 'info' as const, label: 'Stream connecting' }
+  if (connection.state === 'disconnected')
+    return { variant: 'critical' as const, label: 'Stream offline' }
+  return { variant: 'neutral' as const, label: 'Stream idle' }
+})
 
 const chartSlots = [
   { id: 'rate', title: 'Event rate', subtitle: 'events / second over time', icon: Chart01Icon },
@@ -40,18 +55,47 @@ const chartSlots = [
         <div>
           <h2 class="text-lg font-semibold">Overview</h2>
           <p class="text-xs text-muted">
-            Live threat operations — placeholder until Stage 3 wires the stream.
+            {{ totalText }} events ingested · buffer {{ events.bufferSize }} / {{ events.MAX_EVENTS }}
           </p>
         </div>
-        <BaseBadge variant="accent" dot>Stream not connected</BaseBadge>
+        <BaseBadge :variant="streamBadge.variant" dot>{{ streamBadge.label }}</BaseBadge>
       </div>
 
       <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <BaseCard v-for="m in metrics" :key="m.id">
+        <BaseCard>
           <div class="p-4">
-            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">{{ m.label }}</p>
-            <p class="mt-2 font-mono text-2xl font-semibold tracking-tight">{{ m.value }}</p>
-            <p class="mt-1 text-xs text-muted">{{ m.trend }}</p>
+            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Events / sec</p>
+            <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
+              {{ eventsPerSec }}
+            </p>
+            <p class="mt-1 text-xs text-muted">5s rolling window</p>
+          </div>
+        </BaseCard>
+        <BaseCard>
+          <div class="p-4">
+            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Critical alerts</p>
+            <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
+              {{ metrics.criticalCount }}
+            </p>
+            <p class="mt-1 text-xs text-muted">in current buffer</p>
+          </div>
+        </BaseCard>
+        <BaseCard>
+          <div class="p-4">
+            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Blocked / mitigated</p>
+            <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
+              {{ blockedPct }}
+            </p>
+            <p class="mt-1 text-xs text-muted">of ingested events</p>
+          </div>
+        </BaseCard>
+        <BaseCard>
+          <div class="p-4">
+            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Throughput</p>
+            <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
+              {{ connection.throughput }}
+            </p>
+            <p class="mt-1 text-xs text-muted">events / sec target</p>
           </div>
         </BaseCard>
       </div>
@@ -70,7 +114,7 @@ const chartSlots = [
           <div
             class="mt-4 flex flex-1 items-center justify-center rounded-md border border-dashed border-border/70 bg-surface-2/40 text-xs text-muted"
           >
-            Awaiting stream
+            Chart lands in Stage 4
           </div>
         </div>
       </BaseCard>
@@ -89,7 +133,7 @@ const chartSlots = [
           <div
             class="mt-4 flex flex-1 items-center justify-center rounded-md border border-dashed border-border/70 bg-surface-2/40 text-xs text-muted"
           >
-            Awaiting stream
+            Virtualized feed lands in Stage 5
           </div>
         </div>
       </BaseCard>

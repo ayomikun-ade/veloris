@@ -1,5 +1,35 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import { useConnectionStore, type ConnectionState } from '@/stores/connection'
+
+const connection = useConnectionStore()
+
+const LABELS: Record<ConnectionState, string> = {
+  idle: 'Idle',
+  connecting: 'Connecting',
+  connected: 'Live',
+  paused: 'Paused',
+  disconnected: 'Offline',
+}
+
+const DOT_CLASS: Record<ConnectionState, string> = {
+  idle: 'bg-muted',
+  connecting: 'bg-severity-info',
+  connected: 'bg-severity-low',
+  paused: 'bg-severity-medium',
+  disconnected: 'bg-severity-critical',
+}
+
+const PING_CLASS: Record<ConnectionState, string> = {
+  idle: '',
+  connecting: 'bg-severity-info',
+  connected: 'bg-severity-low',
+  paused: '',
+  disconnected: '',
+}
+
+const showPing = computed(() => PING_CLASS[connection.state] !== '')
 </script>
 
 <template>
@@ -16,11 +46,17 @@ import ThemeToggle from '@/components/ThemeToggle.vue'
       >
         <span class="relative flex h-2 w-2">
           <span
-            class="absolute inset-0 inline-flex h-full w-full animate-ping rounded-full bg-severity-low opacity-75"
+            v-if="showPing"
+            :class="[
+              'absolute inset-0 inline-flex h-full w-full animate-ping rounded-full opacity-75',
+              PING_CLASS[connection.state],
+            ]"
           />
-          <span class="relative inline-flex h-2 w-2 rounded-full bg-severity-low" />
+          <span
+            :class="['relative inline-flex h-2 w-2 rounded-full', DOT_CLASS[connection.state]]"
+          />
         </span>
-        <span>Live</span>
+        <span>{{ LABELS[connection.state] }}</span>
       </div>
       <ThemeToggle />
     </div>
