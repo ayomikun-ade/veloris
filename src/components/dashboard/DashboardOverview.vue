@@ -12,6 +12,7 @@ import BaseBadge from '@/components/BaseBadge.vue'
 import EventRateChart from '@/components/charts/EventRateChart.vue'
 import SeverityMixChart from '@/components/charts/SeverityMixChart.vue'
 import TopCategoriesChart from '@/components/charts/TopCategoriesChart.vue'
+import ActivityFeed from '@/components/feed/ActivityFeed.vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useEventsStore } from '@/stores/events'
 import { useMetricsStore } from '@/stores/metrics'
@@ -138,24 +139,13 @@ const streamBadge = computed(() => {
 
     <section id="activity" class="grid grid-cols-1 gap-3 lg:grid-cols-3">
       <BaseCard class="lg:col-span-2">
-        <div class="flex min-h-[280px] flex-col p-4">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-sm font-semibold">Activity feed</p>
-              <p class="text-xs text-muted">Live event log — newest first</p>
-            </div>
-            <HugeiconsIcon :icon="Activity01Icon" :size="18" class="text-muted" />
-          </div>
-          <div
-            class="mt-4 flex flex-1 items-center justify-center rounded-md border border-dashed border-border/70 bg-surface-2/40 text-xs text-muted"
-          >
-            Virtualized feed lands in Stage 5
-          </div>
+        <div class="h-130">
+          <ActivityFeed />
         </div>
       </BaseCard>
 
       <BaseCard>
-        <div class="flex min-h-[280px] flex-col p-4">
+        <div class="flex h-130 flex-col p-4">
           <div class="flex items-start justify-between">
             <div>
               <p class="text-sm font-semibold">Geographic origins</p>
