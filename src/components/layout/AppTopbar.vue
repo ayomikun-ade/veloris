@@ -2,8 +2,10 @@
 import { computed } from 'vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import { useConnectionStore, type ConnectionState } from '@/stores/connection'
+import { useNow } from '@/composables/useNow'
 
 const connection = useConnectionStore()
+const now = useNow()
 
 const LABELS: Record<ConnectionState, string> = {
   idle: 'Idle',
@@ -30,6 +32,15 @@ const PING_CLASS: Record<ConnectionState, string> = {
 }
 
 const showPing = computed(() => PING_CLASS[connection.state] !== '')
+
+const statusLabel = computed(() => {
+  if (connection.state === 'disconnected' && connection.reconnectAt !== null) {
+    const remaining = Math.max(0, connection.reconnectAt - now.value)
+    const secs = Math.ceil(remaining / 1000)
+    return secs > 0 ? `Reconnect in ${secs}s` : 'Reconnecting…'
+  }
+  return LABELS[connection.state]
+})
 </script>
 
 <template>
@@ -56,7 +67,7 @@ const showPing = computed(() => PING_CLASS[connection.state] !== '')
             :class="['relative inline-flex h-2 w-2 rounded-full', DOT_CLASS[connection.state]]"
           />
         </span>
-        <span>{{ LABELS[connection.state] }}</span>
+        <span>{{ statusLabel }}</span>
       </div>
       <ThemeToggle />
     </div>

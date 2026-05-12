@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import { HugeiconsIcon } from '@hugeicons/vue'
-import { PauseIcon, PlayIcon } from '@hugeicons/core-free-icons'
+import {
+  PauseIcon,
+  PlayIcon,
+  Unlink02Icon,
+  VolumeHighIcon,
+  VolumeMute01Icon,
+} from '@hugeicons/core-free-icons'
 import BaseButton from '@/components/BaseButton.vue'
 import { SEVERITIES, type Severity } from '@/types/event'
 import { useConnectionStore } from '@/stores/connection'
 import { useFiltersStore } from '@/stores/filters'
+import { useToastsStore } from '@/stores/toasts'
 import { useStream } from '@/composables/useStreamConnection'
 
 const connection = useConnectionStore()
 const filters = useFiltersStore()
+const toasts = useToastsStore()
 const stream = useStream()
 
 function togglePause() {
@@ -19,6 +27,10 @@ function togglePause() {
 function onThroughputInput(e: Event) {
   const v = Number((e.target as HTMLInputElement).value)
   stream.setThroughput(v)
+}
+
+function toggleSound() {
+  toasts.setSoundEnabled(!toasts.soundEnabled)
 }
 
 const SEVERITY_DOT: Record<Severity, string> = {
@@ -46,11 +58,23 @@ const SEVERITY_LABEL: Record<Severity, string> = {
       <BaseButton
         variant="secondary"
         size="sm"
+        :disabled="connection.isDisconnected"
         :aria-label="connection.isPaused ? 'Resume stream' : 'Pause stream'"
         @click="togglePause"
       >
         <HugeiconsIcon :icon="connection.isPaused ? PlayIcon : PauseIcon" :size="14" />
         <span class="hidden sm:inline">{{ connection.isPaused ? 'Resume' : 'Pause' }}</span>
+      </BaseButton>
+
+      <BaseButton
+        variant="ghost"
+        size="icon"
+        :disabled="connection.isDisconnected"
+        aria-label="Simulate disconnect"
+        title="Simulate a worker disconnect (tests reconnect logic)"
+        @click="stream.simulateDisconnect()"
+      >
+        <HugeiconsIcon :icon="Unlink02Icon" :size="14" />
       </BaseButton>
 
       <label class="flex items-center gap-2 text-xs">
@@ -93,22 +117,39 @@ const SEVERITY_LABEL: Record<Severity, string> = {
     </div>
 
     <div class="ml-auto flex items-center gap-2">
-      <span class="text-[11px] uppercase tracking-[0.18em] text-muted">Window</span>
-      <div class="inline-flex rounded-md border bg-surface-2 p-0.5">
-        <button
-          v-for="opt in filters.TIME_RANGE_OPTIONS"
-          :key="opt"
-          type="button"
-          :class="[
-            'rounded px-2 py-1 text-xs font-medium transition-colors',
-            filters.timeRangeSec === opt
-              ? 'bg-accent text-on-accent'
-              : 'text-muted hover:text-text',
-          ]"
-          @click="filters.setTimeRange(opt)"
-        >
-          {{ filters.TIME_RANGE_LABEL[opt] }}
-        </button>
+      <BaseButton
+        variant="ghost"
+        size="icon"
+        :aria-pressed="toasts.soundEnabled"
+        :aria-label="toasts.soundEnabled ? 'Mute critical alert sounds' : 'Enable critical alert sounds'"
+        :title="toasts.soundEnabled ? 'Mute alerts' : 'Enable alert sound'"
+        @click="toggleSound"
+      >
+        <HugeiconsIcon
+          :icon="toasts.soundEnabled ? VolumeHighIcon : VolumeMute01Icon"
+          :size="14"
+          :class="toasts.soundEnabled ? 'text-accent' : ''"
+        />
+      </BaseButton>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] uppercase tracking-[0.18em] text-muted">Window</span>
+        <div class="inline-flex rounded-md border bg-surface-2 p-0.5">
+          <button
+            v-for="opt in filters.TIME_RANGE_OPTIONS"
+            :key="opt"
+            type="button"
+            :class="[
+              'rounded px-2 py-1 text-xs font-medium transition-colors',
+              filters.timeRangeSec === opt
+                ? 'bg-accent text-on-accent'
+                : 'text-muted hover:text-text',
+            ]"
+            @click="filters.setTimeRange(opt)"
+          >
+            {{ filters.TIME_RANGE_LABEL[opt] }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
