@@ -25,7 +25,7 @@ import { NAV_ITEMS } from '@/lib/navigation'
       </a>
     </nav>
     <div class="border-t px-5 py-4 text-[11px] tracking-[0.18em] text-muted uppercase">
-      Stage 10 · Polish
+      Veloris · v1.0
     </div>
   </aside>
 </template>
