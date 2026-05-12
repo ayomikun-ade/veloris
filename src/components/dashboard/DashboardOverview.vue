@@ -1,12 +1,5 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent } from 'vue'
-import { HugeiconsIcon } from '@hugeicons/vue'
-import {
-  Chart01Icon,
-  ChartAreaIcon,
-  Activity01Icon,
-  GridViewIcon,
-} from '@hugeicons/core-free-icons'
 import BaseCard from '@/components/BaseCard.vue'
 import BaseBadge from '@/components/BaseBadge.vue'
 import ControlsBar from '@/components/dashboard/ControlsBar.vue'
@@ -69,7 +62,7 @@ const streamBadge = computed(() => {
       <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
         <BaseCard>
           <div class="p-4">
-            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Events / sec</p>
+            <p class="text-[11px] tracking-[0.18em] text-muted uppercase">Events / sec</p>
             <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
               {{ eventsPerSec }}
             </p>
@@ -78,7 +71,7 @@ const streamBadge = computed(() => {
         </BaseCard>
         <BaseCard>
           <div class="p-4">
-            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Critical alerts</p>
+            <p class="text-[11px] tracking-[0.18em] text-muted uppercase">Critical alerts</p>
             <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
               {{ metrics.criticalCount }}
             </p>
@@ -87,7 +80,7 @@ const streamBadge = computed(() => {
         </BaseCard>
         <BaseCard>
           <div class="p-4">
-            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Blocked / mitigated</p>
+            <p class="text-[11px] tracking-[0.18em] text-muted uppercase">Blocked / mitigated</p>
             <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
               {{ blockedPct }}
             </p>
@@ -96,7 +89,7 @@ const streamBadge = computed(() => {
         </BaseCard>
         <BaseCard>
           <div class="p-4">
-            <p class="text-[11px] uppercase tracking-[0.18em] text-muted">Throughput</p>
+            <p class="text-[11px] tracking-[0.18em] text-muted uppercase">Throughput</p>
             <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
               {{ connection.throughput }}
             </p>
@@ -108,47 +101,20 @@ const streamBadge = computed(() => {
 
     <section id="threats" class="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
       <BaseCard>
-        <div class="flex h-70 flex-col p-4">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-sm font-semibold">Event rate</p>
-              <p class="text-xs text-muted">events / second · last 2 min</p>
-            </div>
-            <HugeiconsIcon :icon="Chart01Icon" :size="18" class="text-muted" />
-          </div>
-          <div class="mt-3 min-h-0 flex-1">
-            <EventRateChart />
-          </div>
+        <div class="h-70">
+          <EventRateChart />
         </div>
       </BaseCard>
 
       <BaseCard>
-        <div class="flex h-70 flex-col p-4">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-sm font-semibold">Severity mix</p>
-              <p class="text-xs text-muted">stacked by severity · last 2 min</p>
-            </div>
-            <HugeiconsIcon :icon="ChartAreaIcon" :size="18" class="text-muted" />
-          </div>
-          <div class="mt-3 min-h-0 flex-1">
-            <SeverityMixChart />
-          </div>
+        <div class="h-70">
+          <SeverityMixChart />
         </div>
       </BaseCard>
 
       <BaseCard class="lg:col-span-2 xl:col-span-1">
-        <div class="flex h-70 flex-col p-4">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-sm font-semibold">Top categories</p>
-              <p class="text-xs text-muted">attack types in current buffer</p>
-            </div>
-            <HugeiconsIcon :icon="Activity01Icon" :size="18" class="text-muted" />
-          </div>
-          <div class="mt-3 min-h-0 flex-1">
-            <TopCategoriesChart />
-          </div>
+        <div class="h-70">
+          <TopCategoriesChart />
         </div>
       </BaseCard>
     </section>
@@ -169,19 +135,8 @@ const streamBadge = computed(() => {
 
     <section id="patterns" class="space-y-3">
       <BaseCard>
-        <div class="flex h-80 flex-col p-4">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-sm font-semibold">Activity heatmap</p>
-              <p class="text-xs text-muted">
-                events per category in 5-minute buckets · last hour
-              </p>
-            </div>
-            <HugeiconsIcon :icon="GridViewIcon" :size="18" class="text-muted" />
-          </div>
-          <div class="mt-3 min-h-0 flex-1">
-            <CategoryHeatmap />
-          </div>
+        <div class="h-80">
+          <CategoryHeatmap />
         </div>
       </BaseCard>
     </section>

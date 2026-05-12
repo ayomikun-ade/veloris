@@ -2,6 +2,8 @@
 import { computed, onBeforeUnmount, shallowRef, watch } from 'vue'
 import VChart from 'vue-echarts'
 import type { EChartsOption } from 'echarts'
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { GridViewIcon } from '@hugeicons/core-free-icons'
 import '@/lib/echarts'
 import { CATEGORIES, type Category, type ThreatEvent } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
@@ -9,6 +11,7 @@ import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
 import { useNow } from '@/composables/useNow'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import ChartSkeleton from '@/components/ChartSkeleton.vue'
 
 const BUCKET_MIN = 5
 const N_BUCKETS = 12
@@ -20,6 +23,8 @@ const filters = useFiltersStore()
 const theme = useChartTheme()
 const now = useNow()
 const reducedMotion = usePrefersReducedMotion()
+
+const hasData = computed(() => events.bufferSize > 0)
 
 /**
  * 1 Hz throttled snapshot. The events store triggers ~10 times/sec at the
@@ -151,5 +156,19 @@ const option = computed<EChartsOption>(() => {
 </script>
 
 <template>
-  <VChart :option="option" autoresize class="h-full w-full" />
+  <div class="flex h-full flex-col p-4">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="text-sm font-semibold">Activity heatmap</p>
+        <p class="text-xs text-muted">
+          events per category in 5-minute buckets · last hour
+        </p>
+      </div>
+      <HugeiconsIcon :icon="GridViewIcon" :size="18" class="text-muted" />
+    </div>
+    <div class="mt-3 min-h-0 flex-1">
+      <VChart v-if="hasData" :option="option" autoresize class="h-full w-full" />
+      <ChartSkeleton v-else />
+    </div>
+  </div>
 </template>
