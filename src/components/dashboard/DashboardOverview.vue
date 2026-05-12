@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import {
   Chart01Icon,
@@ -10,15 +10,26 @@ import {
 import BaseCard from '@/components/BaseCard.vue'
 import BaseBadge from '@/components/BaseBadge.vue'
 import ControlsBar from '@/components/dashboard/ControlsBar.vue'
-import EventRateChart from '@/components/charts/EventRateChart.vue'
-import SeverityMixChart from '@/components/charts/SeverityMixChart.vue'
-import TopCategoriesChart from '@/components/charts/TopCategoriesChart.vue'
 import TopSourceCountries from '@/components/charts/TopSourceCountries.vue'
-import CategoryHeatmap from '@/components/charts/CategoryHeatmap.vue'
 import ActivityFeed from '@/components/feed/ActivityFeed.vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useEventsStore } from '@/stores/events'
 import { useMetricsStore } from '@/stores/metrics'
+
+// ECharts-backed charts are lazy-loaded so the engine (~200 kB gz) sits in its
+// own chunk and doesn't block initial paint.
+const EventRateChart = defineAsyncComponent(
+  () => import('@/components/charts/EventRateChart.vue'),
+)
+const SeverityMixChart = defineAsyncComponent(
+  () => import('@/components/charts/SeverityMixChart.vue'),
+)
+const TopCategoriesChart = defineAsyncComponent(
+  () => import('@/components/charts/TopCategoriesChart.vue'),
+)
+const CategoryHeatmap = defineAsyncComponent(
+  () => import('@/components/charts/CategoryHeatmap.vue'),
+)
 
 const connection = useConnectionStore()
 const events = useEventsStore()

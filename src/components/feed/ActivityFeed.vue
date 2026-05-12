@@ -5,7 +5,7 @@ import { HugeiconsIcon } from '@hugeicons/vue'
 import { Activity01Icon, Search01Icon, Cancel01Icon } from '@hugeicons/core-free-icons'
 import BaseBadge from '@/components/BaseBadge.vue'
 import EventDetailDrawer from '@/components/feed/EventDetailDrawer.vue'
-import { SEVERITIES, type Severity, type Status, type ThreatEvent } from '@/types/event'
+import type { Severity, Status, ThreatEvent } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
 import { useNow } from '@/composables/useNow'
@@ -19,7 +19,10 @@ const filtered = computed<ThreatEvent[]>(() => {
   const buf = events.events
   const active = filters.activeSeverities
   const q = filters.search.trim().toLowerCase()
-  if (active.size === SEVERITIES.length && q.length === 0) return buf
+  // Always produce a new array. The events store mutates its shallowRef-backed
+  // buffer in place and calls triggerRef, so handing back the same reference
+  // here would make Vue's computed identity-check skip downstream updates and
+  // vue-virtual's count getter would never re-read.
   const result: ThreatEvent[] = []
   for (const ev of buf) {
     if (!active.has(ev.severity)) continue

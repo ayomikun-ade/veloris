@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, shallowRef, watch } from 'vue'
 import VChart from 'vue-echarts'
 import type { EChartsOption } from 'echarts'
 import '@/lib/echarts'
-import { CATEGORIES, type Category } from '@/types/event'
+import { CATEGORIES, type Category, type ThreatEvent } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
@@ -12,11 +12,40 @@ import { useNow } from '@/composables/useNow'
 const BUCKET_MIN = 5
 const N_BUCKETS = 12
 const BUCKET_MS = BUCKET_MIN * 60_000
+const AGGREGATION_INTERVAL_MS = 1000
 
 const events = useEventsStore()
 const filters = useFiltersStore()
 const theme = useChartTheme()
 const now = useNow()
+
+/**
+ * 1 Hz throttled snapshot. The events store triggers ~10 times/sec at the
+ * default throughput; recomputing an O(buffer × categories) aggregation that
+ * often is wasteful when the heatmap's smallest visual unit is a 5-minute
+ * bucket. Snapshotting once a second keeps the heatmap visibly live without
+ * burning CPU on indistinguishable frames.
+ */
+const snapshot = shallowRef<ThreatEvent[]>(events.events)
+let scheduled: number | null = null
+
+watch(
+  () => events.events,
+  () => {
+    if (scheduled !== null) return
+    scheduled = window.setTimeout(() => {
+      snapshot.value = events.events
+      scheduled = null
+    }, AGGREGATION_INTERVAL_MS)
+  },
+)
+
+onBeforeUnmount(() => {
+  if (scheduled !== null) {
+    clearTimeout(scheduled)
+    scheduled = null
+  }
+})
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
@@ -25,12 +54,11 @@ const option = computed<EChartsOption>(() => {
   const bucketEnd = Math.floor(nowMs / BUCKET_MS) * BUCKET_MS + BUCKET_MS
   const bucketStart = bucketEnd - N_BUCKETS * BUCKET_MS
 
-  // counts[bucketIdx][categoryIdx]
   const counts: number[][] = Array.from({ length: N_BUCKETS }, () =>
     new Array<number>(CATEGORIES.length).fill(0),
   )
 
-  for (const ev of events.events) {
+  for (const ev of snapshot.value) {
     if (!active.has(ev.severity)) continue
     if (ev.timestamp < bucketStart || ev.timestamp >= bucketEnd) continue
     const bIdx = Math.floor((ev.timestamp - bucketStart) / BUCKET_MS)
@@ -38,7 +66,6 @@ const option = computed<EChartsOption>(() => {
     if (cIdx >= 0) counts[bIdx][cIdx]++
   }
 
-  // ECharts heatmap data: [xIdx, yIdx, value]
   const data: [number, number, number][] = []
   let max = 1
   for (let b = 0; b < N_BUCKETS; b++) {

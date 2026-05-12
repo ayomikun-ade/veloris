@@ -86,13 +86,42 @@ The worker accepts control messages:
 
 ## Rendering optimization decisions
 
-_TBD — populated in Stage 8 (perf pass)._
+**Reactivity discipline**
 
-Already in place from this stage:
+- **`shallowRef` + `triggerRef`** for the 5,000-event buffer and the 3,600-bucket timeseries. Vue tracks identity changes only — no deep observer tax per event/bucket field.
+- **Worker batching** at 100 ms collapses ~25 individual `postMessage` calls into a single structured-clone per tick.
+- **1 Hz aggregation snapshot** in `CategoryHeatmap` — the events buffer triggers at 10 Hz, but the heatmap's smallest visual unit is a 5-minute bucket. Snapshotting once a second cuts the per-second aggregation work 10× without any visible difference.
+- **`animationDurationUpdate: 0`** on every ECharts series so streaming updates don't jitter between animation frames.
 
-- `shallowRef` for the event buffer (no deep reactivity tax)
-- `triggerRef` so mutations on the buffer trigger updates exactly once per batch
-- 100 ms worker batching to amortize structured-clone cost across many events
+**Bundle splitting** (production build)
+
+| Chunk | Size (gz) | When it loads |
+| --- | --- | --- |
+| `index` (app shell + layout) | ~46 kB | initial paint |
+| `pinia` | ~44 kB | initial paint |
+| `charts` (ECharts engine + all chart components) | ~204 kB | when the first chart mounts |
+| `stream.worker` | ~3 kB | worker startup |
+| `PerfOverlay` | ~1 kB | only when `?perf=1` is set |
+
+The initial bundle is **~90 kB gz** — the dashboard shell paints before the chart engine arrives. Lazy-loaded chunks share a single ECharts copy via Rollup's auto-deduplication.
+
+**Worker isolation of the validation schema.** Zod schemas live in `src/types/event.schema.ts` (separate from the type aliases in `src/types/event.ts`). The worker imports only the pure types/enums — keeps zod (~50 kB) out of the worker chunk, where it isn't used.
+
+**Lifecycle hygiene**
+
+Every long-lived resource has an explicit teardown:
+
+- `useStreamConnection`: `worker.terminate()` + `clearInterval(tickId)` in `onScopeDispose`
+- `useNow`: refcounted singleton interval — stops when the last consumer's scope disposes
+- `PerfOverlay`: `cancelAnimationFrame` + `clearInterval` in `onBeforeUnmount`
+- `CategoryHeatmap`: aggregation `setTimeout` cleared in `onBeforeUnmount`
+- ECharts instances disposed automatically by `vue-echarts` when its component unmounts
+- `useVirtualizer` (vue-virtual) owns its `ResizeObserver` and scroll-listener lifecycle
+- Reka `DialogRoot` cleans up focus trap / scroll lock / escape handler when the drawer's `v-if` removes it
+
+**Dev perf overlay**
+
+Append `?perf=1` to the URL to render a fixed-position overlay showing FPS, JS heap (Chromium only), buffer fill, total ingested, throughput target, and dropped-payload count. The overlay itself is lazy-loaded; it doesn't ship with the default bundle.
 
 ## Trade-offs
 

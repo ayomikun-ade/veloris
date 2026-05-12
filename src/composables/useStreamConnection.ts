@@ -2,7 +2,8 @@ import { inject, onScopeDispose, type InjectionKey } from 'vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useEventsStore } from '@/stores/events'
 import { useTimeseriesStore } from '@/stores/timeseries'
-import { ThreatEventSchema, type ThreatEvent } from '@/types/event'
+import type { ThreatEvent } from '@/types/event'
+import { ThreatEventSchema } from '@/types/event.schema'
 import StreamWorker from '@/workers/stream.worker?worker'
 
 type WorkerOutput =
