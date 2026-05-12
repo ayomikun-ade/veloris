@@ -7,10 +7,12 @@ import type { Severity } from '@/types/event'
 import { useTimeseriesStore } from '@/stores/timeseries'
 import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
+import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 
 const timeseries = useTimeseriesStore()
 const filters = useFiltersStore()
 const theme = useChartTheme()
+const reducedMotion = usePrefersReducedMotion()
 
 const SEVERITY_ORDER: Severity[] = ['info', 'low', 'medium', 'high', 'critical']
 
@@ -32,8 +34,9 @@ const option = computed<EChartsOption>(() => {
   }))
 
   return {
-    animation: true,
+    animation: !reducedMotion.value,
     animationDurationUpdate: 0,
+    aria: { enabled: true },
     color: visible.map((s) => t.severity[s]),
     legend: {
       data: visible,

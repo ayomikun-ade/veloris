@@ -7,12 +7,14 @@ import type { Category } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
+import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 
 const TOP_N = 8
 
 const events = useEventsStore()
 const filters = useFiltersStore()
 const theme = useChartTheme()
+const reducedMotion = usePrefersReducedMotion()
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
@@ -27,8 +29,9 @@ const option = computed<EChartsOption>(() => {
   const values = sorted.map(([, c]) => c).reverse()
 
   return {
-    animation: true,
+    animation: !reducedMotion.value,
     animationDurationUpdate: 0,
+    aria: { enabled: true },
     grid: { left: 110, right: 28, top: 8, bottom: 22, containLabel: false },
     xAxis: {
       type: 'value',

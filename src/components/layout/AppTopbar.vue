@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { HugeiconsIcon } from '@hugeicons/vue'
+import { Menu01Icon } from '@hugeicons/core-free-icons'
+import BaseButton from '@/components/BaseButton.vue'
 import ThemeToggle from '@/components/ThemeToggle.vue'
 import { useConnectionStore, type ConnectionState } from '@/stores/connection'
 import { useNow } from '@/composables/useNow'
+
+defineEmits<{ 'open-mobile-nav': [] }>()
 
 const connection = useConnectionStore()
 const now = useNow()
@@ -48,6 +53,15 @@ const statusLabel = computed(() => {
     class="flex h-14 items-center justify-between border-b bg-surface/60 px-4 backdrop-blur md:px-6"
   >
     <div class="flex items-center gap-3">
+      <BaseButton
+        variant="ghost"
+        size="icon"
+        class="md:hidden"
+        aria-label="Open navigation"
+        @click="$emit('open-mobile-nav')"
+      >
+        <HugeiconsIcon :icon="Menu01Icon" :size="18" />
+      </BaseButton>
       <h1 class="text-sm font-semibold tracking-tight">Overview</h1>
       <span class="hidden text-xs text-muted sm:inline">Real-time threat operations</span>
     </div>

@@ -8,6 +8,8 @@
 
   --animate-slide-in-right: slide-in-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
   --animate-slide-out-right: slide-out-right 180ms cubic-bezier(0.4, 0, 1, 1);
+  --animate-slide-in-left: slide-in-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-out-left: slide-out-left 180ms cubic-bezier(0.4, 0, 1, 1);
   --animate-fade-in: fade-in 180ms ease-out;
   --animate-fade-out: fade-out 140ms ease-in;
 
@@ -25,6 +27,22 @@
     }
     to {
       transform: translateX(100%);
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes slide-out-left {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
     }
   }
   @keyframes fade-in {
@@ -88,5 +106,16 @@
     background-color: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-sans);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

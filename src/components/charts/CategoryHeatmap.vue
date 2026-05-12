@@ -8,6 +8,7 @@ import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
 import { useNow } from '@/composables/useNow'
+import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
 
 const BUCKET_MIN = 5
 const N_BUCKETS = 12
@@ -18,6 +19,7 @@ const events = useEventsStore()
 const filters = useFiltersStore()
 const theme = useChartTheme()
 const now = useNow()
+const reducedMotion = usePrefersReducedMotion()
 
 /**
  * 1 Hz throttled snapshot. The events store triggers ~10 times/sec at the
@@ -83,8 +85,9 @@ const option = computed<EChartsOption>(() => {
   }
 
   return {
-    animation: true,
+    animation: !reducedMotion.value,
     animationDurationUpdate: 0,
+    aria: { enabled: true },
     grid: { left: 124, right: 70, top: 8, bottom: 28, containLabel: false },
     xAxis: {
       type: 'category',
