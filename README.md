@@ -48,7 +48,12 @@ pnpm install
 pnpm dev
 ```
 
-Then open the URL printed by Vite. Append `?perf=1` to the URL for the dev perf overlay.
+Then open the URL printed by Vite. The app has two routes:
+
+- **`/`** — landing page (hero + features + CTA)
+- **`/dashboard`** — the live dashboard (lazy-loaded, so landing visitors don't pay for the chart engine until they click through)
+
+Append `?perf=1` to either URL for the dev perf overlay (FPS, JS heap, throughput readouts).
 
 ### Scripts
 
@@ -260,8 +265,13 @@ src/
     event.schema.ts      zod schemas (kept out of the worker chunk)
   workers/
     stream.worker.ts     weighted event generator + batching
-  App.vue                provides stream + error boundary
-  main.ts                Vue + Pinia + fonts
+  router/
+    index.ts             vue-router: / (landing) + /dashboard (lazy)
+  views/
+    LandingView.vue      hero + features + CTA (initial bundle)
+    DashboardView.vue    AppShell + stream provider (lazy)
+  App.vue                RouterView + global overlays (toaster, error, perf)
+  main.ts                Vue + Pinia + Router + fonts
   style.css              @theme tokens + @keyframes + reduced-motion
 ```
 

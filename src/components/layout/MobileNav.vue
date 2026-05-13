@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import {
   DialogRoot,
   DialogPortal,
@@ -31,10 +32,14 @@ function close() {
         aria-label="Primary navigation"
       >
         <div class="flex h-14 items-center justify-between border-b px-5">
-          <div class="flex items-center gap-2">
+          <RouterLink
+            to="/"
+            class="flex items-center gap-2 focus-visible:outline-hidden"
+            @click="close"
+          >
             <HugeiconsIcon :icon="Shield02Icon" :size="22" class="text-accent" />
             <DialogTitle class="font-semibold tracking-tight">Veloris</DialogTitle>
-          </div>
+          </RouterLink>
           <DialogClose
             class="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-surface-2 hover:text-text focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent"
             aria-label="Close navigation"

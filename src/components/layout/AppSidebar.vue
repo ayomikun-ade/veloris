@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { Shield02Icon } from '@hugeicons/core-free-icons'
 import { NAV_ITEMS } from '@/lib/navigation'
@@ -9,10 +10,14 @@ import { NAV_ITEMS } from '@/lib/navigation'
     class="hidden shrink-0 flex-col border-r bg-surface/60 backdrop-blur md:flex md:w-60 lg:w-64"
     aria-label="Primary navigation"
   >
-    <div class="flex h-14 items-center gap-2 border-b px-5">
+    <RouterLink
+      to="/"
+      class="flex h-14 items-center gap-2 border-b px-5 transition-colors hover:bg-surface-2 focus-visible:bg-surface-2 focus-visible:outline-hidden"
+      aria-label="Back to landing"
+    >
       <HugeiconsIcon :icon="Shield02Icon" :size="22" class="text-accent" />
       <span class="font-semibold tracking-tight">Veloris</span>
-    </div>
+    </RouterLink>
     <nav class="flex-1 space-y-1 px-3 py-4">
       <a
         v-for="item in NAV_ITEMS"
