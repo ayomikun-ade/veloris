@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#202636" stroke-width="0.8" />
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#06080e" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0" />
+      <stop offset="50%" stop-color="#22d3ee" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#06080e" />
+  <rect width="1200" height="630" fill="url(#grid)" />
+  <rect width="1200" height="630" fill="url(#glow)" />
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1200" height="2" fill="url(#accentLine)" />
+
+  <!-- Shield mark -->
+  <g transform="translate(140, 215)">
+    <path
+      d="M50 0 L100 15 L100 55 C100 90 75 115 50 130 C25 115 0 90 0 55 L0 15 Z"
+      fill="none"
+      stroke="#22d3ee"
+      stroke-width="6"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+    />
+    <path
+      d="M22 62 L42 82 L78 44"
+      fill="none"
+      stroke="#22d3ee"
+      stroke-width="6"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="290"
+    y="290"
+    fill="#e2e8f0"
+    font-family="'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="128"
+    font-weight="600"
+    letter-spacing="-3"
+  >Veloris</text>
+
+  <!-- Tagline -->
+  <text
+    x="294"
+    y="345"
+    fill="#828aa8"
+    font-family="'IBM Plex Sans', system-ui, sans-serif"
+    font-size="32"
+    font-weight="400"
+    letter-spacing="0.5"
+  >Real-time cybersecurity threat-ops analytics</text>
+
+  <!-- Severity legend chips -->
+  <g transform="translate(294, 405)" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="18">
+    <g>
+      <circle cx="10" cy="10" r="6" fill="#38bdf8" />
+      <text x="26" y="16" fill="#828aa8">info</text>
+    </g>
+    <g transform="translate(110, 0)">
+      <circle cx="10" cy="10" r="6" fill="#34d399" />
+      <text x="26" y="16" fill="#828aa8">low</text>
+    </g>
+    <g transform="translate(210, 0)">
+      <circle cx="10" cy="10" r="6" fill="#fbbf24" />
+      <text x="26" y="16" fill="#828aa8">medium</text>
+    </g>
+    <g transform="translate(335, 0)">
+      <circle cx="10" cy="10" r="6" fill="#fb923c" />
+      <text x="26" y="16" fill="#828aa8">high</text>
+    </g>
+    <g transform="translate(440, 0)">
+      <circle cx="10" cy="10" r="6" fill="#f43f5e" />
+      <text x="26" y="16" fill="#828aa8">critical</text>
+    </g>
+  </g>
+
+  <!-- Live indicator (top-right corner) -->
+  <g transform="translate(1080, 50)">
+    <circle cx="0" cy="0" r="6" fill="#34d399" />
+    <circle cx="0" cy="0" r="12" fill="none" stroke="#34d399" stroke-width="1.5" opacity="0.4" />
+    <text
+      x="22"
+      y="6"
+      fill="#828aa8"
+      font-family="'IBM Plex Mono', ui-monospace, monospace"
+      font-size="16"
+      letter-spacing="2"
+    >LIVE</text>
+  </g>
+</svg>
