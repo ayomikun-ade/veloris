@@ -10,6 +10,7 @@ import {
   Wifi01Icon,
 } from '@hugeicons/core-free-icons'
 import ThemeToggle from '@/components/ThemeToggle.vue'
+import MiniDashboardPreview from '@/components/landing/MiniDashboardPreview.vue'
 
 const features = [
   {
@@ -63,16 +64,11 @@ const stats = [
     />
     <div
       class="pointer-events-none absolute inset-0"
-      style="
-        background:
-          radial-gradient(ellipse at top, transparent 40%, var(--color-bg) 95%);
-      "
+      style="background: radial-gradient(ellipse at top, transparent 40%, var(--color-bg) 95%)"
     />
 
-    <!-- Top bar (lightweight) -->
-    <header
-      class="relative z-10 flex h-16 items-center justify-between px-6 md:px-10"
-    >
+    <!-- Top bar -->
+    <header class="relative z-10 flex h-16 items-center justify-between px-6 md:px-10">
       <div class="flex items-center gap-2">
         <HugeiconsIcon :icon="Shield02Icon" :size="22" class="text-accent" />
         <span class="font-semibold tracking-tight">Veloris</span>
@@ -88,74 +84,59 @@ const stats = [
       </div>
     </header>
 
-    <!-- Hero -->
-    <main class="relative z-10 mx-auto max-w-6xl px-6 pt-12 pb-20 md:px-10 md:pt-20">
-      <section class="text-center">
-        <div
-          class="mx-auto inline-flex items-center gap-2 rounded-full border bg-surface/60 px-3 py-1 text-[11px] font-medium tracking-[0.18em] text-muted uppercase backdrop-blur"
-        >
-          <span class="relative flex h-1.5 w-1.5">
-            <span
-              class="absolute inset-0 inline-flex h-full w-full animate-ping rounded-full bg-severity-low opacity-75"
-            />
-            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-severity-low" />
-          </span>
-          Live demo available
-        </div>
-
-        <h1
-          class="mt-6 text-5xl font-semibold tracking-tight md:text-7xl"
-          style="letter-spacing: -0.04em"
-        >
-          Real-time threat-ops,
-          <span class="text-accent">in the browser.</span>
-        </h1>
-
-        <p class="mx-auto mt-6 max-w-2xl text-base text-muted md:text-lg">
-          Veloris streams synthesized cybersecurity events through a typed Vue pipeline.
-          Five live visualizations, a virtualized 5,000-row activity feed, and exponential
-          reconnect backoff — all driven by a Web Worker generator with no backend required.
-        </p>
-
-        <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <RouterLink
-            to="/dashboard"
-            class="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-sm font-semibold text-on-accent shadow-lg shadow-accent/20 transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-hidden"
-          >
-            Launch dashboard
-            <HugeiconsIcon :icon="ArrowRight02Icon" :size="16" />
-          </RouterLink>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener"
-            class="inline-flex h-11 items-center gap-2 rounded-md border bg-surface px-5 text-sm font-medium text-muted transition-colors hover:bg-surface-2 hover:text-text focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-hidden"
-          >
-            View the README
-          </a>
-        </div>
-
-        <!-- Stats strip -->
-        <div
-          class="mx-auto mt-14 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border/40 md:grid-cols-4"
-        >
+    <main class="relative z-10 mx-auto max-w-6xl px-6 pt-10 pb-20 md:px-10 md:pt-16">
+      <!-- Hero: split layout (copy + live preview) -->
+      <section class="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+        <div>
           <div
-            v-for="s in stats"
-            :key="s.label"
-            class="bg-surface/60 px-4 py-5 backdrop-blur"
+            class="inline-flex items-center gap-2 rounded-full border bg-surface/60 px-3 py-1 text-[11px] font-medium tracking-[0.18em] text-muted uppercase backdrop-blur"
           >
-            <p class="font-mono text-2xl font-semibold tracking-tight text-text tabular-nums">
-              {{ s.value }}
-            </p>
-            <p class="mt-1 text-[11px] tracking-[0.18em] text-muted uppercase">
-              {{ s.label }}
-            </p>
+            <span class="relative flex h-1.5 w-1.5">
+              <span
+                class="absolute inset-0 inline-flex h-full w-full animate-ping rounded-full bg-severity-low opacity-75"
+              />
+              <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-severity-low" />
+            </span>
+            Live demo available
           </div>
+
+          <h1
+            class="mt-6 text-5xl font-semibold tracking-tight md:text-6xl"
+            style="letter-spacing: -0.04em"
+          >
+            Threat operations,
+            <br class="hidden sm:block" />
+            <span class="text-accent">live in the browser.</span>
+          </h1>
+
+          <p class="mt-6 max-w-xl text-base text-muted md:text-lg">
+            Five live visualizations, a virtualized 5,000-row activity feed, and exponential
+            reconnect backoff — all driven by a Web Worker generator. No backend, no setup.
+          </p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <RouterLink
+              to="/dashboard"
+              class="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 text-sm font-semibold text-on-accent shadow-lg shadow-accent/20 transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-hidden"
+            >
+              Launch dashboard
+              <HugeiconsIcon :icon="ArrowRight02Icon" :size="16" />
+            </RouterLink>
+          </div>
+        </div>
+
+        <!-- Live preview -->
+        <div class="relative">
+          <!-- Accent glow behind the panel -->
+          <div
+            class="pointer-events-none absolute -inset-4 rounded-3xl bg-accent/10 blur-2xl"
+          />
+          <MiniDashboardPreview class="relative" />
         </div>
       </section>
 
       <!-- Features -->
-      <section class="mt-24">
+      <section class="mt-24 md:mt-32">
         <div class="text-center">
           <p class="text-[11px] font-medium tracking-[0.22em] text-accent uppercase">
             What's inside
@@ -187,8 +168,22 @@ const stats = [
         </div>
       </section>
 
+      <!-- Compact stats strip -->
+      <section
+        class="mx-auto mt-16 grid max-w-3xl grid-cols-2 gap-px overflow-hidden rounded-xl border bg-border/40 md:grid-cols-4"
+      >
+        <div v-for="s in stats" :key="s.label" class="bg-surface/60 px-4 py-5 backdrop-blur">
+          <p class="font-mono text-2xl font-semibold tracking-tight text-text tabular-nums">
+            {{ s.value }}
+          </p>
+          <p class="mt-1 text-[11px] tracking-[0.18em] text-muted uppercase">
+            {{ s.label }}
+          </p>
+        </div>
+      </section>
+
       <!-- Repeat CTA -->
-      <section class="mt-24 text-center">
+      <section class="mt-20 text-center">
         <div
           class="mx-auto inline-flex flex-col items-center gap-5 rounded-xl border bg-surface/60 px-8 py-10 backdrop-blur md:flex-row md:gap-8 md:px-12"
         >

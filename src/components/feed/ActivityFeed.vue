@@ -9,14 +9,20 @@ import type { Severity, Status, ThreatEvent } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
 import { useNow } from '@/composables/useNow'
+import { useThrottledRef } from '@/composables/useThrottledRef'
 import { formatRelativeTime } from '@/lib/format'
 
 const events = useEventsStore()
 const filters = useFiltersStore()
 const now = useNow()
 
+// The feed batches its visual updates to ~1 Hz so 10 events/sec arrive as a
+// single chunk of new rows rather than ten micro-inserts that flicker the
+// scroll position. The underlying buffer still ingests at native rate.
+const eventsSnapshot = useThrottledRef(() => events.events, 1000)
+
 const filtered = computed<ThreatEvent[]>(() => {
-  const buf = events.events
+  const buf = eventsSnapshot.value
   const active = filters.activeSeverities
   const q = filters.search.trim().toLowerCase()
   // Always produce a new array. The events store mutates its shallowRef-backed

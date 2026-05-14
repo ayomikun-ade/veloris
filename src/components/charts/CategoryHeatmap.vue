@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, shallowRef, watch } from 'vue'
+import { computed } from 'vue'
 import VChart from 'vue-echarts'
 import type { EChartsOption } from 'echarts'
 import { HugeiconsIcon } from '@hugeicons/vue'
 import { GridViewIcon } from '@hugeicons/core-free-icons'
 import '@/lib/echarts'
-import { CATEGORIES, type Category, type ThreatEvent } from '@/types/event'
+import { CATEGORIES, type Category } from '@/types/event'
 import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
 import { useNow } from '@/composables/useNow'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { useThrottledRef } from '@/composables/useThrottledRef'
 import ChartSkeleton from '@/components/ChartSkeleton.vue'
 
 const BUCKET_MIN = 5
 const N_BUCKETS = 12
 const BUCKET_MS = BUCKET_MIN * 60_000
-const AGGREGATION_INTERVAL_MS = 1000
 
 const events = useEventsStore()
 const filters = useFiltersStore()
@@ -26,33 +26,9 @@ const reducedMotion = usePrefersReducedMotion()
 
 const hasData = computed(() => events.bufferSize > 0)
 
-/**
- * 1 Hz throttled snapshot. The events store triggers ~10 times/sec at the
- * default throughput; recomputing an O(buffer × categories) aggregation that
- * often is wasteful when the heatmap's smallest visual unit is a 5-minute
- * bucket. Snapshotting once a second keeps the heatmap visibly live without
- * burning CPU on indistinguishable frames.
- */
-const snapshot = shallowRef<ThreatEvent[]>(events.events)
-let scheduled: number | null = null
-
-watch(
-  () => events.events,
-  () => {
-    if (scheduled !== null) return
-    scheduled = window.setTimeout(() => {
-      snapshot.value = events.events
-      scheduled = null
-    }, AGGREGATION_INTERVAL_MS)
-  },
-)
-
-onBeforeUnmount(() => {
-  if (scheduled !== null) {
-    clearTimeout(scheduled)
-    scheduled = null
-  }
-})
+// 1 Hz snapshot — the smallest visual unit on this chart is a 5-minute bucket,
+// so anything faster than 1 Hz is wasted work.
+const eventsSnapshot = useThrottledRef(() => events.events, 1500)
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
@@ -65,7 +41,7 @@ const option = computed<EChartsOption>(() => {
     new Array<number>(CATEGORIES.length).fill(0),
   )
 
-  for (const ev of snapshot.value) {
+  for (const ev of eventsSnapshot.value) {
     if (!active.has(ev.severity)) continue
     if (ev.timestamp < bucketStart || ev.timestamp >= bucketEnd) continue
     const bIdx = Math.floor((ev.timestamp - bucketStart) / BUCKET_MS)

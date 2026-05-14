@@ -8,6 +8,7 @@ import ActivityFeed from '@/components/feed/ActivityFeed.vue'
 import { useConnectionStore } from '@/stores/connection'
 import { useEventsStore } from '@/stores/events'
 import { useMetricsStore } from '@/stores/metrics'
+import { useThrottledRef } from '@/composables/useThrottledRef'
 
 // ECharts-backed charts are lazy-loaded so the engine (~200 kB gz) sits in its
 // own chunk and doesn't block initial paint.
@@ -28,9 +29,20 @@ const connection = useConnectionStore()
 const events = useEventsStore()
 const metrics = useMetricsStore()
 
-const eventsPerSec = computed(() => metrics.eventsPerSecond.toFixed(1))
-const blockedPct = computed(() => `${Math.round(metrics.blockedRate * 100)}%`)
-const totalText = computed(() => events.totalIngested.toLocaleString())
+// Throttle the displayed metric values so numbers don't twitch at 10 Hz.
+// The underlying stores still update at native rate; only the rendered
+// readouts breathe at 1.5 s.
+const eventsPerSecondRaw = useThrottledRef(() => metrics.eventsPerSecond, 1500)
+const criticalCountRaw = useThrottledRef(() => metrics.criticalCount, 1500)
+const blockedRateRaw = useThrottledRef(() => metrics.blockedRate, 1500)
+const totalIngestedRaw = useThrottledRef(() => events.totalIngested, 1500)
+const bufferSizeRaw = useThrottledRef(() => events.bufferSize, 1500)
+
+const eventsPerSec = computed(() => eventsPerSecondRaw.value.toFixed(1))
+const criticalCount = computed(() => criticalCountRaw.value)
+const blockedPct = computed(() => `${Math.round(blockedRateRaw.value * 100)}%`)
+const totalText = computed(() => totalIngestedRaw.value.toLocaleString())
+const bufferSize = computed(() => bufferSizeRaw.value)
 
 const streamBadge = computed(() => {
   if (connection.state === 'connected') return { variant: 'low' as const, label: 'Stream live' }
@@ -52,7 +64,7 @@ const streamBadge = computed(() => {
         <div>
           <h2 class="text-lg font-semibold">Overview</h2>
           <p class="text-xs text-muted">
-            {{ totalText }} events ingested · buffer {{ events.bufferSize }} /
+            {{ totalText }} events ingested · buffer {{ bufferSize }} /
             {{ events.MAX_EVENTS }}
           </p>
         </div>
@@ -73,7 +85,7 @@ const streamBadge = computed(() => {
           <div class="p-4">
             <p class="text-[11px] tracking-[0.18em] text-muted uppercase">Critical alerts</p>
             <p class="mt-2 font-mono text-2xl font-semibold tracking-tight tabular-nums">
-              {{ metrics.criticalCount }}
+              {{ criticalCount }}
             </p>
             <p class="mt-1 text-xs text-muted">in current buffer</p>
           </div>

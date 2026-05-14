@@ -11,6 +11,7 @@ import { useFiltersStore, TIME_RANGE_LABEL } from '@/stores/filters'
 import { useEventsStore } from '@/stores/events'
 import { useChartTheme } from '@/composables/useChartTheme'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { useThrottledRef } from '@/composables/useThrottledRef'
 import ChartSkeleton from '@/components/ChartSkeleton.vue'
 import ChartTypePicker from '@/components/ChartTypePicker.vue'
 
@@ -31,11 +32,17 @@ const reducedMotion = usePrefersReducedMotion()
 
 const chartType = ref<ChartType>('area')
 
+// Throttle the underlying buckets to 1 Hz. Filter changes (severity / window)
+// still drive an immediate option re-compute because they're read directly
+// inside the computed below.
+const bucketsSnapshot = useThrottledRef(() => timeseries.buckets, 1500)
+
 const hasData = computed(() => events.bufferSize > 0)
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
-  const buckets = timeseries.lastNSeconds(filters.timeRangeSec)
+  const all = bucketsSnapshot.value
+  const buckets = all.slice(Math.max(0, all.length - filters.timeRangeSec))
   const active = filters.activeSeverities
   const points = buckets.map((b) => {
     let total = 0

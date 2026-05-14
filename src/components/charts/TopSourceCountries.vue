@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
+import { useThrottledRef } from '@/composables/useThrottledRef'
 import { countryFlag, countryName } from '@/lib/countryFlag'
 
 const TOP_N = 8
@@ -9,10 +10,13 @@ const TOP_N = 8
 const events = useEventsStore()
 const filters = useFiltersStore()
 
+// 1 Hz snapshot — the bars resize less frenetically.
+const eventsSnapshot = useThrottledRef(() => events.events, 1500)
+
 const topCountries = computed(() => {
   const active = filters.activeSeverities
   const counts = new Map<string, number>()
-  for (const ev of events.events) {
+  for (const ev of eventsSnapshot.value) {
     if (!active.has(ev.severity)) continue
     counts.set(ev.sourceCountry, (counts.get(ev.sourceCountry) ?? 0) + 1)
   }
@@ -50,7 +54,7 @@ const topCountries = computed(() => {
           </div>
           <div class="h-1 overflow-hidden rounded-full bg-surface-2">
             <div
-              class="h-full rounded-full bg-accent transition-[width] duration-300 ease-out"
+              class="h-full rounded-full bg-accent transition-[width] duration-500 ease-out"
               :style="{ width: `${entry.pct}%` }"
             />
           </div>

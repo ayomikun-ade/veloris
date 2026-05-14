@@ -10,6 +10,7 @@ import { useEventsStore } from '@/stores/events'
 import { useFiltersStore } from '@/stores/filters'
 import { useChartTheme } from '@/composables/useChartTheme'
 import { usePrefersReducedMotion } from '@/composables/usePrefersReducedMotion'
+import { useThrottledRef } from '@/composables/useThrottledRef'
 import ChartSkeleton from '@/components/ChartSkeleton.vue'
 import ChartTypePicker from '@/components/ChartTypePicker.vue'
 
@@ -28,13 +29,17 @@ const reducedMotion = usePrefersReducedMotion()
 
 const chartType = ref<ChartType>('horizontal')
 
+// 1 Hz snapshot of the events buffer. Bar reordering at 10 Hz was the most
+// jarring widget on the dashboard; throttling the source visibly calms it.
+const eventsSnapshot = useThrottledRef(() => events.events, 1500)
+
 const hasData = computed(() => events.bufferSize > 0)
 
 const option = computed<EChartsOption>(() => {
   const t = theme.value
   const active = filters.activeSeverities
   const counts = new Map<Category, number>()
-  for (const ev of events.events) {
+  for (const ev of eventsSnapshot.value) {
     if (!active.has(ev.severity)) continue
     counts.set(ev.category, (counts.get(ev.category) ?? 0) + 1)
   }
@@ -42,8 +47,6 @@ const option = computed<EChartsOption>(() => {
 
   const isHorizontal = chartType.value === 'horizontal'
 
-  // For horizontal bars, ECharts renders categories bottom→top, so reverse to
-  // put the highest value at the top. For vertical bars, keep highest on the left.
   const names = isHorizontal ? sorted.map(([n]) => n).reverse() : sorted.map(([n]) => n)
   const values = isHorizontal ? sorted.map(([, c]) => c).reverse() : sorted.map(([, c]) => c)
 
