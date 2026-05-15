@@ -38,7 +38,7 @@ const VARIANT: Record<ToastVariant, { ring: string; icon: typeof Alert01Icon; ic
     leave-active-class="transition transform duration-200 ease-in absolute right-0"
     leave-from-class="opacity-100 translate-x-0"
     leave-to-class="opacity-0 translate-x-6"
-    class="pointer-events-none fixed top-4 right-4 z-50 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2"
+    class="pointer-events-none fixed bottom-4 right-4 z-50 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2"
     role="region"
     aria-label="Notifications"
     aria-live="polite"
