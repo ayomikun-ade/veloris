@@ -2,7 +2,7 @@
 
 Real-time cybersecurity threat-ops analytics dashboard. HNG Internship **Stage 5A — Frontend Wizards** submission.
 
-> All 11 build stages complete. The dashboard streams synthesized threat events through a typed worker pipeline, validates each payload, renders four live ECharts visualizations + a virtualized 5,000-row activity feed, and survives connection drops with exponential reconnect backoff.
+> The dashboard streams synthesized threat events through a typed worker pipeline, validates each payload, renders four live ECharts visualizations + a virtualized 5,000-row activity feed, and survives connection drops with exponential reconnect backoff.
 
 ---
 
@@ -286,9 +286,3 @@ src/
 > - Severity mix with one or two severities filtered out (showing cascade)
 > - Mobile breakpoint with the drawer open
 > - Light theme
-
----
-
-## Project plan
-
-Veloris was built across 11 commitable stages. See [`docs/PRODUCT.md`](docs/PRODUCT.md) for the brief and grading rubric the build was scored against.
